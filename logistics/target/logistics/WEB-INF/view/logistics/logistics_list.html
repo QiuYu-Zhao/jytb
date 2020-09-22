@@ -28,7 +28,6 @@
                 <li onclick="yidaohuoBtn()">已到货</li>
                 <li onclick="yizuofeiBtn()">已作废</li>
             </ul>
-            <input type="text" class="m-wrap span6" name = "state" id = "state" placeholder="" style="display: none;" />
         </div>
         <div class="span2">
             <button  type="button" id="queryBtn" onclick="queryFun()" class="btn blue"  style="width: 100px;">查询</button>
@@ -182,7 +181,7 @@
                             </div>
                         </div>
                     </div>
-
+                    <input type="text" class="m-wrap span6" name = "state" id = "state" placeholder="" style="display: none;" />
 
                 </div>
             </form>
@@ -205,6 +204,9 @@
                 </div>
                 <div class="actions">
                     <a  onclick="deleteHsitoryDataFun()" id="z_deleteHsitoryData" class="btn blue"><i class="icon-minus"></i> 删除30天数据</a>
+                </div>
+                <div class="actions">
+                    <a id="z_exportExcel" onclick="exportExcel()" class="btn blue"><i class="icon-list-alt"></i>Excel导出</a>
                 </div>
             </div>
             <div class="portlet-body">
@@ -432,6 +434,7 @@
     // 待分配
     function daifenpeiBtn() {
         $('#z_allocation').show();
+        $('#z_exportExcel').show();
         $('#z_totalMoney').hide();
         $('#z_title').html('待分配')
         $("#state").val('1')
@@ -442,6 +445,7 @@
     function yifenpeiBtn() {
         $('#z_allocation').hide();
         $('#z_totalMoney').hide();
+        $('#z_exportExcel').show();
         $("#state").val('2')
         $('#z_title').html('已分配');
         queryFun();
@@ -451,6 +455,7 @@
     function yidaohuoBtn() {
         $('#z_allocation').hide();
         $('#z_totalMoney').show();
+        $('#z_exportExcel').show();
         $("#state").val('3')
         $('#z_title').html('已到货');
         queryFun();
@@ -460,6 +465,7 @@
     function yizuofeiBtn() {
         $('#z_allocation').hide();
         $('#z_totalMoney').hide();
+        $('#z_exportExcel').show();
         $("#state").val('-1')
         $('#z_title').html('已作废');
         $('#cancelClass').hide();
@@ -556,8 +562,17 @@
                 time: 2000
             });
         });
-
+        var exportButton = $("#z_exportExcel");
+        exportButton.click(function () {
+            exportExcel();
+        });
     });
+
+    function exportExcel() {
+        $("#queryForm").attr("action", "/mk/logistics/exportData.html");
+        $("#queryForm").submit();
+    }
+
     function allocationFun() {
         layer.open({
             type: 1,

@@ -98,10 +98,8 @@
           <element id="library" level="project" name="Maven: org.xhtmlrenderer:flying-saucer-core:9.0.3" />
           <element id="file-copy" path="$PROJECT_DIR$/lib/contract.jar" />
           <element id="file-copy" path="$PROJECT_DIR$/lib/dao.jar" />
-          <element id="file-copy" path="$PROJECT_DIR$/lib/utils.jar" />
           <element id="file-copy" path="$PROJECT_DIR$/lib/phoenix-contract.jar" />
-          <element id="library" level="module" name="Maven: com.alibaba:jconsole:1.8.0" module-name="logistics" />
-          <element id="library" level="module" name="Maven: com.alibaba:tools:1.8.0" module-name="logistics" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/utils.jar" />
         </element>
       </element>
       <element id="directory" name="META-INF">
