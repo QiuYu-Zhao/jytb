@@ -93,4 +93,12 @@ public interface ILogisticsService {
      * @throws Exception
      */
     public void deleteHsitoryData() throws Exception;
+
+    /**
+     * 生成发货编号
+     *
+     * @return
+     * @throws Exception
+     */
+    public String getSystemNum() throws Exception;
 }

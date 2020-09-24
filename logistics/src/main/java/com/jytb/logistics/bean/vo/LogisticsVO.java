@@ -29,6 +29,11 @@ public class LogisticsVO implements Serializable {
     private String stateS;
 
     /**
+     * 系统编号
+     */
+    private String systemNum;
+
+    /**
      * 收货人
      */
     private String receiver;
@@ -89,6 +94,16 @@ public class LogisticsVO implements Serializable {
     private BigDecimal freightCharge;
 
     /**
+     * 现付
+     */
+    private BigDecimal nowPay;
+
+    /**
+     * 到付
+     */
+    private BigDecimal reachPay;
+
+    /**
      * 是否代收（0.否，1.是）
      */
     private int instead;
@@ -104,7 +119,7 @@ public class LogisticsVO implements Serializable {
     private String remark;
 
     /**
-     *发货人
+     * 发货人
      */
     private String sender;
 
@@ -146,12 +161,13 @@ public class LogisticsVO implements Serializable {
     private int count;
 
     public LogisticsVO(Logistics logistics) {
-        if(logistics == null){
+        if (logistics == null) {
             return;
         }
         this.id = logistics.getId();
         this.state = logistics.getState();
         this.stateS = LogisticsStateEnum.getDescByCode(logistics.getState());
+        this.systemNum = logistics.getSystemNum();
         this.receiver = logistics.getReceiver();
         this.receiverTel = logistics.getReceiverTel();
         this.receiverProvince = logistics.getReceiverProvince();
@@ -164,6 +180,8 @@ public class LogisticsVO implements Serializable {
         this.receiverAreaName = logistics.getReceiverAreaName();
         this.receiverStreetName = logistics.getReceiverStreetName();
         this.freightCharge = logistics.getFreightCharge();
+        this.nowPay = logistics.getNowPay();
+        this.reachPay = logistics.getReachPay();
         this.instead = logistics.getInstead();
         this.insteadCharge = logistics.getInsteadCharge();
         this.remark = logistics.getRemark();
@@ -200,6 +218,14 @@ public class LogisticsVO implements Serializable {
 
     public void setStateS(String stateS) {
         this.stateS = stateS;
+    }
+
+    public String getSystemNum() {
+        return systemNum;
+    }
+
+    public void setSystemNum(String systemNum) {
+        this.systemNum = systemNum;
     }
 
     public String getReceiver() {
@@ -296,6 +322,22 @@ public class LogisticsVO implements Serializable {
 
     public void setFreightCharge(BigDecimal freightCharge) {
         this.freightCharge = freightCharge;
+    }
+
+    public BigDecimal getNowPay() {
+        return nowPay;
+    }
+
+    public void setNowPay(BigDecimal nowPay) {
+        this.nowPay = nowPay;
+    }
+
+    public BigDecimal getReachPay() {
+        return reachPay;
+    }
+
+    public void setReachPay(BigDecimal reachPay) {
+        this.reachPay = reachPay;
     }
 
     public int getInstead() {

@@ -104,6 +104,13 @@ public class LogisticsController {
     }
 
 
+    /**
+     * 创建增加系统编号
+     *
+     * @param request
+     * @param logistics
+     * @return
+     */
     @RequestMapping(value = "create", produces = "text/html;charset=UTF-8")
     public String create(HttpServletRequest request, Logistics logistics) {
         try {
@@ -142,14 +149,15 @@ public class LogisticsController {
             logistics.setUpdateTime(now);
             logistics.setCreator(MkSessionHolder.get().getUsername());
             logistics.setOperator(MkSessionHolder.get().getUsername());
+            String systemNum = logisticsService.getSystemNum();
+            logistics.setSystemNum(systemNum);
             logisticsService.insertLogistics(logistics);
         } catch (Exception e) {
-            logger.error("进入创建物流单页面错误，", e);
+            logger.error("进入创建物流单页面错误!", e);
         }
 
         return "redirect:/mk/logistics/list.html";
     }
-
 
     @RequestMapping(value = "send", produces = "text/html;charset=UTF-8")
     @ResponseBody
@@ -364,17 +372,25 @@ public class LogisticsController {
             if (materialLists.size() > 0) {
                 materialLists.forEach(material -> {
                     List<ExcelData> list = new ArrayList<>();
-                    list.add(new ExcelData(StringUtil.g(material.getReceiverAddress())));
+                    list.add(new ExcelData(StringUtil.g(material.getSystemNum())));
+                    list.add(new ExcelData(StringUtil.g(material.getSender())));
                     list.add(new ExcelData(StringUtil.g(material.getReceiver())));
-                    list.add(new ExcelData(StringUtil.g(material.getReceiverAreaName())));
-                    list.add(new ExcelData(StringUtil.g(material.getReceiverCityName())));
-                    list.add(new ExcelData(StringUtil.g(material.getReceiverProvinceName())));
+                    list.add(new ExcelData(StringUtil.g(material.getReceiverTel())));
+                    list.add(new ExcelData(StringUtil.g(material.getReceiverAddress())));
+                    list.add(new ExcelData(StringUtil.g(material.getFreightCharge())));
+                    list.add(new ExcelData(StringUtil.g(material.getNowPay())));
+                    list.add(new ExcelData(StringUtil.g(material.getReachPay())));
+                    list.add(new ExcelData(StringUtil.g(material.getInstead() == 1 ? "是" : "否")));
+                    list.add(new ExcelData(StringUtil.g(material.getInsteadCharge())));
                     list.add(new ExcelData(StringUtil.g(material.getCount())));
+                    list.add(new ExcelData(StringUtil.g(material.getRouteName())));
+                    list.add(new ExcelData(StringUtil.g(material.getRemark())));
+                    list.add(new ExcelData(StringUtil.g(material.getCreateTime())));
                     if (!CollectionUtil.isEmpty(list)) {
                         data.add(list);
                     }
                 });
-                headList = Arrays.asList("发件人", "收件人", "联系方式", "收货地址", "运费(元)", "是否代收", "代收费(元)", "数量", "线路", "备注", "创建时间");
+                headList = Arrays.asList("编号", "发件人", "收件人", "联系方式", "收货地址", "运费(元)", "现付", "到付", "是否代收", "代收费(元)", "数量", "线路", "备注", "创建时间");
                 ExcelUtil.exportExcel(headList, data, response, "logistics");
             }
         } catch (Exception e) {

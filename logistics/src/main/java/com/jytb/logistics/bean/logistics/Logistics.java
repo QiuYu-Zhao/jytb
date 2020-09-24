@@ -29,6 +29,12 @@ public class Logistics implements Serializable {
     private int state;
 
     /**
+     * 系统编号
+     */
+    @Column(name = "system_num")
+    private String systemNum;
+
+    /**
      * 收货人
      */
     @Column(name = "receiver")
@@ -119,6 +125,18 @@ public class Logistics implements Serializable {
     private BigDecimal freightCharge;
 
     /**
+     * 现付
+     */
+    @Column(name = "now_pay")
+    private BigDecimal nowPay;
+
+    /**
+     * 到付
+     */
+    @Column(name = "reach_pay")
+    private BigDecimal reachPay;
+
+    /**
      * 是否代收（0.否，1.是）
      */
     @Column(name = "instead")
@@ -137,7 +155,7 @@ public class Logistics implements Serializable {
     private String remark;
 
     /**
-     *发货人
+     * 发货人
      */
     @Column(name = "sender")
     private String sender;
@@ -210,6 +228,14 @@ public class Logistics implements Serializable {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public String getSystemNum() {
+        return systemNum;
+    }
+
+    public void setSystemNum(String systemNum) {
+        this.systemNum = systemNum;
     }
 
     public String getReceiver() {
@@ -330,6 +356,22 @@ public class Logistics implements Serializable {
 
     public void setFreightCharge(BigDecimal freightCharge) {
         this.freightCharge = freightCharge;
+    }
+
+    public BigDecimal getNowPay() {
+        return nowPay;
+    }
+
+    public void setNowPay(BigDecimal nowPay) {
+        this.nowPay = nowPay;
+    }
+
+    public BigDecimal getReachPay() {
+        return reachPay;
+    }
+
+    public void setReachPay(BigDecimal reachPay) {
+        this.reachPay = reachPay;
     }
 
     public int getInstead() {

@@ -14,7 +14,7 @@
             <!-- END RESPONSIVE QUICK SEARCH FORM -->
         </li>
 
-    <@security.authorize access="hasRole('ADMIN') or hasRole('PC')">
+        <@security.authorize access="hasRole('ADMIN') or hasRole('PC')">
         <li class="">
             <a href="javascript:;">
                 <i class="icon-book"></i>
@@ -28,18 +28,30 @@
     </@security.authorize>
 
     <@security.authorize access="hasRole('ADMIN')">
-        <li class="">
-            <a href="javascript:;">
-                <i class="icon-user"></i>
-                <span class="title">线路管理</span>
-                <span class="arrow "></span>
-            </a>
-            <ul class="sub-menu">
-                <li><a target="rightFrame" href="/mk/admin/user/list.html" onclick="setStateFun()">线路管理</a></li>
-            </ul>
-        </li>
+    <li class="">
+        <a href="javascript:;">
+            <i class="icon-user"></i>
+            <span class="title">线路管理</span>
+            <span class="arrow "></span>
+        </a>
+        <ul class="sub-menu">
+            <li><a target="rightFrame" href="/mk/admin/user/list.html" onclick="setStateFun()">线路管理</a></li>
+        </ul>
+    </li>
+   </@security.authorize>
 
-    </@security.authorize>
+   <@security.authorize access="hasRole('ADMIN') or hasRole('PC')">
+   <li class="">
+    <a href="javascript:;">
+        <i class="icon-book"></i>
+        <span class="title">客户管理</span>
+        <span class="arrow "></span>
+    </a>
+    <ul class="sub-menu">
+        <li><a target="rightFrame" href="/mk/customer/list.html" onclick="setStateFun()">客户管理</a></li>
+    </ul>
+   </li>
+</@security.authorize>
 
 
 </ul>
@@ -48,9 +60,10 @@
 </div>
 <#include "/common/hidden.html"/>
 <script>
-    function setStateFun(){
+    function setStateFun() {
         sessionStorage.setItem('state', JSON.stringify(1));
     }
+
     jQuery(document).ready(function () {
         //点击菜单箭头变化
         $(".page-sidebar .page-sidebar-menu a").each(function () {

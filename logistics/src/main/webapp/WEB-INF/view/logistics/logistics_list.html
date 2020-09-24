@@ -213,11 +213,14 @@
                 <table class="table table-striped table-bordered table-hover table-full-width" id="device_table">
                     <thead>
                     <tr>
+                        <th>编号</th>
                         <th>发件人</th>
                         <th>收件人</th>
                         <th>联系方式</th>
                         <th>收货地址</th>
                         <th>运费(元)</th>
+                        <th>现付</th>
+                        <th>到付</th>
                         <th>是否代收</th>
                         <th>代收费(元)</th>
                         <th>数量</th>
@@ -225,7 +228,6 @@
                         <th>备注</th>
                         <th>创建时间</th>
                         <th>操作</th>
-                    </tr>
                     </tr>
                     </thead>
                     <tbody>
@@ -304,6 +306,7 @@
                     }
             },
             aoColumns: [
+                { mData: 'systemNum' ,"sWidth": "7%","defaultContent":""},
                 { mData: 'sender' ,"sWidth": "7%","defaultContent":""},
                 { mData: 'receiver' ,"sWidth": "7%","defaultContent":""},
                 { mData: 'receiverTel' ,"sWidth": "7%","defaultContent":""},
@@ -314,6 +317,8 @@
                     }
                 },
                 { mData: 'freightCharge' ,"sWidth": "5%","defaultContent":""},
+                { mData: 'nowPay' ,"sWidth": "5%","defaultContent":""},
+                { mData: 'reachPay' ,"sWidth": "5%","defaultContent":""},
                 {
                     "mDataProp": "id", "sWidth": "5%",
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {

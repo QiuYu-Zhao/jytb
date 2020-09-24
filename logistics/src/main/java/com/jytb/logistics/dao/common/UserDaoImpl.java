@@ -13,7 +13,6 @@ import java.util.List;
 @Repository
 public class UserDaoImpl implements IUserDao {
 
-
     @Override
     public User findById(long id) throws Exception {
         return (User) MKDBHelper.getDAOHelper().get(User.class, id);
@@ -21,7 +20,7 @@ public class UserDaoImpl implements IUserDao {
 
     @Override
     public User findByCondition(String condition) throws Exception {
-//        String userCondition = "username = " +username;
+        System.out.println(condition);
         List<User> userList = (List<User>) MKDBHelper.getDAOHelper().getListByCustom(User.class, "*", condition, "");
         User user = null;
         if (userList != null && !userList.isEmpty()) {
