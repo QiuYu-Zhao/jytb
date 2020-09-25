@@ -32,7 +32,7 @@
                                 <div class="span3">
                                     <label class="control-label">编号</label></div>
                                 <div class="controls">
-                                    <input type="text" class="m-wrap span6"  name = "serialNum" id = "serialNum_c" autocomplete="off" />
+                                    <input type="text" class="m-wrap span6"  name = "systemNum" id = "systemNum_c" autocomplete="off" />
                                 </div>
                             </div>
                         </div>
@@ -139,17 +139,11 @@
                         <thead>
                         <tr>
                             <th>编号</th>
-                            <th>发件人</th>
-                            <th>收件人</th>
-                            <th>联系方式</th>
-                            <th>收货地址</th>
-                            <th>运费(元)</th>
-                            <th>现付</th>
-                            <th>到付</th>
-                            <th>是否代收</th>
-                            <th>代收费(元)</th>
-                            <th>数量</th>
-                            <th>线路</th>
+                            <th>姓名</th>
+                            <th>客户门店名</th>
+                            <th>手机号</th>
+                            <th>地址</th>
+                            <th>线路名</th>
                             <th>备注</th>
                             <th>创建时间</th>
                             <th>操作</th>
@@ -214,37 +208,12 @@
             },
             aoColumns: [
                 { mData: 'systemNum' ,"sWidth": "7%","defaultContent":""},
-                { mData: 'sender' ,"sWidth": "7%","defaultContent":""},
-                { mData: 'receiver' ,"sWidth": "7%","defaultContent":""},
-                { mData: 'receiverTel' ,"sWidth": "7%","defaultContent":""},
-                {
-                    "mDataProp": "id", "sWidth": "7%",
-                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        $(nTd).html(oData.receiverAddress);
-                    }
-                },
-                { mData: 'freightCharge' ,"sWidth": "5%","defaultContent":""},
-                { mData: 'nowPay' ,"sWidth": "5%","defaultContent":""},
-                { mData: 'reachPay' ,"sWidth": "5%","defaultContent":""},
-                {
-                    "mDataProp": "id", "sWidth": "5%",
-                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        if(parseInt(oData.instead)=='1'){
-                            $(nTd).html("是");
-                        } else{
-                            $(nTd).html("否");
-                        }
-                    }
-                },
-                {
-                    "mDataProp": "id", "sWidth": "5%",
-                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        $(nTd).html(oData.insteadCharge);
-                    }
-                },
-                { mData: 'count' ,"sWidth": "7%","defaultContent":""},
-                { mData: 'routeName' ,"sWidth": "7%","defaultContent":""},
-                { mData: 'remark' ,"sWidth": "7%","defaultContent":""},
+                { mData: 'customerName' ,"sWidth": "7%","defaultContent":""},
+                { mData: 'customerShopName' ,"sWidth": "7%","defaultContent":""},
+                { mData: 'phoneNum' ,"sWidth": "7%","defaultContent":""},
+                { mData: 'address' ,"sWidth": "5%","defaultContent":""},
+                { mData: 'routeName' ,"sWidth": "5%","defaultContent":""},
+                { mData: 'remark' ,"sWidth": "5%","defaultContent":""},
                 { mData: 'createTime' ,"sWidth": "7%","defaultContent":""},
                 {
                     "mDataProp": "id","sWidth": "12%",
@@ -287,17 +256,13 @@
         $.ajax({
             url : sSource,//这个就是请求地址对应sAjaxSource 终端ID号，卡号，终端型号，终端类型，终端批次，安装公司，终端状态（已占用，未占用），客户名称
             data : {"aoData":JSON.stringify(aoData),
-                "receiver": $("#receiver_c").val(),
-                "receiverTel": $("#receiverTel_c").val(),
-                "freightCharge":$("#freightCharg_c").val(),
-                "receiverAddress":$("#receiverAddress_c").val(),
-                "insteadCharge" : $("#insteadCharge_c").val(),
-                "count" : $("#count_c").val(),
-                "remark" : $("#remark_c").val(),
-                "sender" : $("#sender_c").val(),
-                "senderTel" : $("#senderTel_c").val(),
+                "systemNum": $("#systemNum_c").val(),
+                "customerName": $("#customerName_c").val(),
+                "customerShopName":$("#customerShopName_c").val(),
+                "phoneNum":$("#phoneNum_c").val(),
+                "address" : $("#address_c").val(),
                 "userId" : $('#userId_c').val(),
-                "state" : $("#state").val(),
+                "remark" : $("#remark_c").val(),
                 "createTimeStart":  createTimeStart,
                 "createTimeEnd":  createTimeEnd
             },//这个是把datatable的一些基本数据传给后台,比如起始位置,每页显示的行数
@@ -328,14 +293,6 @@
     }
 
     jQuery(document).ready(function () {
-        var getState = sessionStorage.getItem('state');
-        if(getState != null){
-            $("#state").val(getState)
-        }else{
-            getState == '1';
-            $("#state").val('1')
-        }
-
         $.fn.datetimepicker.dates['zh'] = {
             days:       ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六","星期日"],
             daysShort:  ["日", "一", "二", "三", "四", "五", "六","日"],
@@ -365,18 +322,17 @@
             maxView:'day'
         });
 
-
         $("#z_tab li").removeClass('selected')
 
         App.init(); // initlayout and core plugins
         initTable();
     });
 
-    function toView(logisticsId,flag) {
-        window.location.href = "/mk/logistics/toView.html?logisticsId=" + logisticsId + "&type="+ flag;
+    function toView(customerID,flag) {
+        window.location.href = "/mk/customer/toView.html?customerId=" + customerID + "&type="+ flag;
     }
 
-    function toDel(logisticsId) {
+    function toDel(customerId) {
         layer.open({
             type: 1,
             title: false,
@@ -390,8 +346,8 @@
             content: '<div style="padding: 40px 40px 20px; line-height: 22px; color: #000; font-weight: 300;">确认删除此条数据吗？<br></div>',
             yes: function(){
                 $.ajax({
-                    url: "/mk/logistics/delete.html",
-                    data: {"logisticsId": logisticsId},
+                    url: "/mk/customer/delete.html",
+                    data: {"customerId": customerId},
                     type: "post",
                     success: function (backdata) {
                         var data = JSON.parse(backdata)
@@ -413,23 +369,6 @@
     }
 
     function createFun() {
-        if($("#receiver_c").val() == ""){
-            layer.tips('请输入收货人', '#receiver_c', {
-                tips: [1, '#e85555'],
-                anim : 6,
-                time: 2000
-            });
-            return;
-        }
-        if($("#sender_c").val() == ''){
-            layer.tips('请输入发件人', '#sender_c', {
-                tips: [1, '#e85555'],
-                anim : 6,
-                time: 2000
-            });
-            return;
-        }
-
         if($("#userId_c").val() == ""){
             layer.tips('选择线路', '#userId_c', {
                 tips: [1, '#e85555'],
@@ -437,15 +376,6 @@
                 time: 2000
             });
             return;
-        }
-        var instead_c = '';
-        if($('#insteadCharge_c').val() && $('#insteadCharge_c').val() != 0){
-            $('#instead_c').val(1);
-        }else{
-            $('#instead_c').val(0);
-        }
-        if(!$('#count_c').val()){
-            $('#count_c').val(0);
         }
         $("#queryForm").submit();
     }

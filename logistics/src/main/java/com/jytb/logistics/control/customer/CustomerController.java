@@ -2,12 +2,21 @@ package com.jytb.logistics.control.customer;
 
 
 import co.chexiao.base.contract.enums.common.ResultEnum;
+import co.chexiao.common.util.CollectionUtil;
+import co.chexiao.common.util.DateUtil;
 import co.chexiao.common.util.StringUtil;
+import co.chexiao.common.util.UniqueIDUtil;
+import co.chexiao.phoenix.contract.bean.excel.ExcelData;
 import com.jytb.logistics.bean.common.User;
-import com.jytb.logistics.bean.role.Role;
-import com.jytb.logistics.bean.vo.UserVO;
+import com.jytb.logistics.bean.customer.Customer;
+import com.jytb.logistics.bean.logistics.Logistics;
+import com.jytb.logistics.bean.vo.CustomerVO;
 import com.jytb.logistics.control.ControllerTool;
+import com.jytb.logistics.service.area.IAreaService;
+import com.jytb.logistics.service.common.MkSessionHolder;
+import com.jytb.logistics.service.logistics.ICustomerService;
 import com.jytb.logistics.service.user.IUserService;
+import com.jytb.logistics.util.excle.ExcelUtil;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,169 +28,234 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
+ * 客户管理控制类
+ *
  * @author zqy
- * @date 2020/09/24
+ * @date 2020/09/25
  */
 @Controller
 @RequestMapping("mk/customer")
 public class CustomerController {
+
     private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
+
+    @Autowired
+    private ICustomerService customerService;
+
+    @Autowired
+    private IAreaService areaService;
 
     @Autowired
     private IUserService userService;
 
+
     @RequestMapping(value = "list", produces = "text/html;charset=UTF-8")
     public String list(ModelMap model) {
+        try {
+            model.addAttribute("userList", userService.getAppRoleUserList());
+        } catch (Exception e) {
+            logger.error("进入客户管理列表错误，", e);
+        }
         return "customer/customer_list";
     }
 
-    /**
-     * 通过省的id查询所属该省的市
-     * @param aoData
-     * @param request
-     * @return
-     */
+
     @RequestMapping(value = "list/page", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String listPage(@RequestParam String aoData,HttpServletRequest request) {
+    public String listPage(@RequestParam String aoData, HttpServletRequest request) {
         ControllerTool.Page page = new ControllerTool().createPage(aoData);
-
         int totalCount = 0;
-        List<UserVO> userVOList = new ArrayList<>();
+        List<CustomerVO> customersVOList = new ArrayList<>();
         try {
-            StringBuilder condition = new StringBuilder("1=1");
-
-            String userName = StringUtil.g(request.getParameter("userName"));
-            String routeName = StringUtil.g(request.getParameter("routeName"));
-
-
-            if (!StringUtil.isEmpty(userName)) {
-                condition.append(" AND username like'").append(userName).append("%' ");
-            }
-
-            if (!StringUtil.isEmpty(routeName)) {
-                condition.append(" AND route_name like'").append(routeName).append("%' ");
-            }
-
-
-            totalCount = userService.getCountByCondition(condition.toString());
-            if(totalCount > 0){
-                List<User> userList = userService.getListByPage(condition.toString(),page.getCurrentPage(),page.iDisplayLength,"id desc");
-                for(User user : userList){
-                    userVOList.add(new UserVO(user));
+            String condition = getCondition(request);
+            totalCount = customerService.getCustomerCountByCondition(condition);
+            if (totalCount > 0) {
+                List<Customer> customersList = customerService.getCustomerListPageByCondition(condition, page.getCurrentPage(), page.iDisplayLength, "id desc");
+                for (Customer customers : customersList) {
+                    customersVOList.add(new CustomerVO(customers));
                 }
             }
         } catch (Exception e) {
-            logger.error("查询用户工单列表出错", e);
+            logger.error("查询客户列表出错", e);
         }
         JSONObject getObj = new JSONObject();
         getObj.put("sEcho", page.sEcho);
         getObj.put("iTotalRecords", totalCount);
         getObj.put("iTotalDisplayRecords", totalCount);
-
-        getObj.put("aaData", userVOList);
+        getObj.put("aaData", customersVOList);
         return getObj.toString();
-
     }
 
-    @RequestMapping(value = "toCreate", produces = "text/html;charset=UTF-8")
-    public String toCreate(ModelMap model) {
-        return "user/user_create";
-    }
 
-    @RequestMapping(value = "checkExist", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String checkExist(@RequestParam String username) {
-
-        User user = userService.findByUsername(username);
-        JSONObject resultObj = new JSONObject();
-        if (user == null) {
-            resultObj.put("code", 1);
-        } else {
-            resultObj.put("code", 0);
-        }
-        return resultObj.toString();
-    }
-
-    @RequestMapping("create")
-    public String create(User user, @RequestParam String role) {
-        logger.info("user ==" + user.getUsername());
-
+    /**
+     * 创建增加系统编号
+     *
+     * @param request
+     * @param customer
+     * @return
+     */
+    @RequestMapping(value = "create", produces = "text/html;charset=UTF-8")
+    public String create(HttpServletRequest request, Customer customer) {
         try {
-            if (!StringUtil.isEmpty(role)) {
-                Role r = new Role();
-                r.setRole(role);
-                user.getRoleList().add(r);
+            Date now = new Date();
+            customer.setId(UniqueIDUtil.getUniqueID());
+            User user = userService.findById(customer.getUserId());
+            if (user != null) {
+                customer.setRouteName(user.getRouteName());
             }
-            userService.insert(user);
+            String reg = "[0-9]+";
+            String customerName = customer.getCustomerName();
+            String[] customerSplit = customerName.split("-");
+            if (customerSplit.length >= 1 && customerSplit[0].matches(reg)) {
+                customer.setSortNum(Integer.parseInt(customerSplit[0]));
+            }
+            customer.setCreateTime(now);
+            customer.setUpdateTime(now);
+            customer.setCreator(MkSessionHolder.get().getUsername());
+            customer.setOperator(MkSessionHolder.get().getUsername());
+            customerService.insertCustomer(customer);
         } catch (Exception e) {
-            logger.error("新增线路失败", e);
+            logger.error("进入客户管理页面错误!", e);
         }
-        return "redirect:/mk/admin/user/list.html";
+        return "redirect:/mk/customer/list.html";
     }
+
 
     /**
      * 进入查看或编辑页面
+     *
      * @param model
-     * @param userId
-     * @param type 1.查看，2.编辑
+     * @param customerId
+     * @param type        1.查看，2.编辑
      * @return
      */
     @RequestMapping(value = "toView", produces = "text/html;charset=UTF-8")
-    public String toView(ModelMap model,@RequestParam long userId,@RequestParam String type) {
+    public String toView(ModelMap model, @RequestParam long customerId, @RequestParam String type) {
         try {
-            User user = userService.findById(userId);
-            if(user != null){
-                UserVO vo = new UserVO(user);
-                model.addAttribute("userModel",vo);
+            Customer customer = customerService.findCustomerById(customerId);
+            if (customer != null) {
+                CustomerVO vo = new CustomerVO(customer);
+                model.addAttribute("customer", vo);
+                model.addAttribute("userList", userService.getAppRoleUserList());
             }
-        }catch (Exception e){
-            logger.error("查看用户信息错误，",e);
-        }
-        //查看
-        if(type.equals("1")){
-            return "user/user_view";
-        }else { //编辑
-            return "user/user_update";
-        }
-    }
-
-    @RequestMapping("update")
-    public String update(ModelMap model, User updateUser, @RequestParam String role) {
-        try {
-            if (!StringUtil.isEmpty(role)) {
-                Role r = new Role();
-                r.setRole(role);
-                updateUser.getRoleList().add(r);
-            }
-
-            userService.update(updateUser);
         } catch (Exception e) {
-            logger.error("更新用户失败", e);
+            logger.error("查看客户管理页面错误，", e);
         }
 
-        return "redirect:/mk/admin/user/list.html";
+        if (type.equals("1")) {
+            return "customer/customer_view";
+        } else {
+            return "customer/customer_update";
+        }
     }
+
+    @RequestMapping(value = "update", produces = "text/html;charset=UTF-8")
+    public String update(HttpServletRequest request, Customer customer) {
+        try {
+            customerService.updateCustomer(customer);
+        } catch (Exception e) {
+            logger.error("修改客户页面错误，", e);
+        }
+        return "redirect:/mk/customer/list.html";
+    }
+
 
     @RequestMapping(value = "delete", produces = "text/html;charset=UTF-8")
     @ResponseBody
-    public String delete(HttpServletRequest request, @RequestParam long userId) {
+    public String delete(HttpServletRequest request, @RequestParam long customerId) {
         JSONObject result = new JSONObject();
         int code = ResultEnum.SUCCESS.getCode();
         String errormsg = "";
         try {
-            userService.deleteByID(userId);
-        }catch (Exception e){
-            logger.error("删除用户错误，",e);
+            customerService.deleteCustomerById(customerId);
+        } catch (Exception e) {
+            logger.error("删除物客户错误，", e);
             code = ResultEnum.FAILED.getCode();
-            errormsg = "删除用户失败，请联系管理员";
+            errormsg = "删除物客户失败，请联系管理员";
         }
-        result.put("code",code);
-        result.put("errormsg",errormsg);
+        result.put("code", code);
+        result.put("errormsg", errormsg);
         return result.toString();
     }
+
+
+    private String getCondition(HttpServletRequest request) {
+        StringBuilder condition = new StringBuilder("1=1");
+        String receiver = StringUtil.g(request.getParameter("receiver"));
+        String receiverTel = StringUtil.g(request.getParameter("receiverTel"));
+        String freightCharge = StringUtil.g(request.getParameter("freightCharge"));
+        String receiverAddress = StringUtil.g(request.getParameter("receiverAddress"));
+        String instead = StringUtil.g(request.getParameter("instead"));
+        String insteadCharge = StringUtil.g(request.getParameter("insteadCharge"));
+        String remark = StringUtil.g(request.getParameter("remark"));
+        String sender = StringUtil.g(request.getParameter("sender"));
+        String senderTel = StringUtil.g(request.getParameter("senderTel"));
+        String userId = StringUtil.g(request.getParameter("userId"));
+        String state = StringUtil.g(request.getParameter("state"));
+        String createTimeStart = StringUtil.g(request.getParameter("createTimeStart"));
+        String createTimeEnd = StringUtil.g(request.getParameter("createTimeEnd"));
+
+        if (!StringUtil.isEmpty(receiver)) {
+            condition.append(" AND receiver like '%").append(receiver).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(receiverTel)) {
+            condition.append(" AND receiver_tel like '%").append(receiverTel).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(freightCharge)) {
+            condition.append(" AND freight_charge = ").append(freightCharge).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(receiverAddress)) {
+            condition.append(" AND full_address like '%").append(receiverAddress).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(instead) && !"0".equals(instead)) {
+            condition.append(" AND instead = ").append(instead).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(insteadCharge)) {
+            condition.append(" AND instead_charge = ").append(insteadCharge).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(remark)) {
+            condition.append(" AND remark like '%").append(remark).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(sender)) {
+            condition.append(" AND sender like '%").append(sender).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(senderTel)) {
+            condition.append(" AND sender_tel like '%").append(senderTel).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(userId)) {
+            condition.append(" AND user_id = ").append(userId).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(state)) {
+            condition.append(" AND state = ").append(state).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(createTimeStart)) {
+            condition.append(" AND create_time >= '").append(createTimeStart).append("' ");
+        }
+
+        if (!StringUtil.isEmpty(createTimeEnd)) {
+            condition.append(" AND create_time <= '").append(createTimeEnd).append("' ");
+        }
+        return condition.toString();
+    }
+
 }
+
