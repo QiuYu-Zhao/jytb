@@ -2,21 +2,16 @@ package com.jytb.logistics.control.customer;
 
 
 import co.chexiao.base.contract.enums.common.ResultEnum;
-import co.chexiao.common.util.CollectionUtil;
-import co.chexiao.common.util.DateUtil;
 import co.chexiao.common.util.StringUtil;
 import co.chexiao.common.util.UniqueIDUtil;
-import co.chexiao.phoenix.contract.bean.excel.ExcelData;
 import com.jytb.logistics.bean.common.User;
 import com.jytb.logistics.bean.customer.Customer;
-import com.jytb.logistics.bean.logistics.Logistics;
 import com.jytb.logistics.bean.vo.CustomerVO;
 import com.jytb.logistics.control.ControllerTool;
 import com.jytb.logistics.service.area.IAreaService;
 import com.jytb.logistics.service.common.MkSessionHolder;
-import com.jytb.logistics.service.logistics.ICustomerService;
+import com.jytb.logistics.service.customer.ICustomerService;
 import com.jytb.logistics.service.user.IUserService;
-import com.jytb.logistics.util.excle.ExcelUtil;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -189,71 +181,42 @@ public class CustomerController {
 
     private String getCondition(HttpServletRequest request) {
         StringBuilder condition = new StringBuilder("1=1");
-        String receiver = StringUtil.g(request.getParameter("receiver"));
-        String receiverTel = StringUtil.g(request.getParameter("receiverTel"));
-        String freightCharge = StringUtil.g(request.getParameter("freightCharge"));
-        String receiverAddress = StringUtil.g(request.getParameter("receiverAddress"));
-        String instead = StringUtil.g(request.getParameter("instead"));
-        String insteadCharge = StringUtil.g(request.getParameter("insteadCharge"));
+        String systemNum = StringUtil.g(request.getParameter("systemNum"));
+        String customerName = StringUtil.g(request.getParameter("customerName"));
+        String customerShopName = StringUtil.g(request.getParameter("customerShopName"));
+        String phoneNum = StringUtil.g(request.getParameter("phoneNum"));
+        String address = StringUtil.g(request.getParameter("address"));
         String remark = StringUtil.g(request.getParameter("remark"));
-        String sender = StringUtil.g(request.getParameter("sender"));
-        String senderTel = StringUtil.g(request.getParameter("senderTel"));
         String userId = StringUtil.g(request.getParameter("userId"));
-        String state = StringUtil.g(request.getParameter("state"));
-        String createTimeStart = StringUtil.g(request.getParameter("createTimeStart"));
-        String createTimeEnd = StringUtil.g(request.getParameter("createTimeEnd"));
 
-        if (!StringUtil.isEmpty(receiver)) {
-            condition.append(" AND receiver like '%").append(receiver).append("%' ");
+        if (!StringUtil.isEmpty(systemNum)) {
+            condition.append(" AND system_num like '%").append(systemNum).append("%' ");
         }
 
-        if (!StringUtil.isEmpty(receiverTel)) {
-            condition.append(" AND receiver_tel like '%").append(receiverTel).append("%' ");
+        if (!StringUtil.isEmpty(customerName)) {
+            condition.append(" AND customer_name like '%").append(customerName).append("%' ");
         }
 
-        if (!StringUtil.isEmpty(freightCharge)) {
-            condition.append(" AND freight_charge = ").append(freightCharge).append(" ");
+        if (!StringUtil.isEmpty(customerShopName)) {
+            condition.append(" AND customer_shop_name = ").append(customerShopName).append(" ");
         }
 
-        if (!StringUtil.isEmpty(receiverAddress)) {
-            condition.append(" AND full_address like '%").append(receiverAddress).append("%' ");
-        }
-
-        if (!StringUtil.isEmpty(instead) && !"0".equals(instead)) {
-            condition.append(" AND instead = ").append(instead).append(" ");
-        }
-
-        if (!StringUtil.isEmpty(insteadCharge)) {
-            condition.append(" AND instead_charge = ").append(insteadCharge).append(" ");
+        if (!StringUtil.isEmpty(address)) {
+            condition.append(" AND address like '%").append(address).append("%' ");
         }
 
         if (!StringUtil.isEmpty(remark)) {
             condition.append(" AND remark like '%").append(remark).append("%' ");
         }
 
-        if (!StringUtil.isEmpty(sender)) {
-            condition.append(" AND sender like '%").append(sender).append("%' ");
-        }
-
-        if (!StringUtil.isEmpty(senderTel)) {
-            condition.append(" AND sender_tel like '%").append(senderTel).append("%' ");
+        if (!StringUtil.isEmpty(phoneNum)) {
+            condition.append(" AND phone_num like '%").append(phoneNum).append("%' ");
         }
 
         if (!StringUtil.isEmpty(userId)) {
             condition.append(" AND user_id = ").append(userId).append(" ");
         }
 
-        if (!StringUtil.isEmpty(state)) {
-            condition.append(" AND state = ").append(state).append(" ");
-        }
-
-        if (!StringUtil.isEmpty(createTimeStart)) {
-            condition.append(" AND create_time >= '").append(createTimeStart).append("' ");
-        }
-
-        if (!StringUtil.isEmpty(createTimeEnd)) {
-            condition.append(" AND create_time <= '").append(createTimeEnd).append("' ");
-        }
         return condition.toString();
     }
 

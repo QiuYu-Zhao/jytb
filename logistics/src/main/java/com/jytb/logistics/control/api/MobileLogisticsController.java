@@ -33,8 +33,7 @@ import java.util.List;
 @RequestMapping("api/logistics")
 public class MobileLogisticsController {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(MobileLogisticsController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MobileLogisticsController.class);
 
     @Autowired
     private IMobileLogisticsService mobileLogisticsService;
@@ -208,6 +207,8 @@ public class MobileLogisticsController {
     @TokenCheck
     public String create(HttpServletRequest request, Logistics logistics) {
         JSONObject resultObj = new JSONObject();
+        JSONObject data = new JSONObject();
+
         Token token = (Token) request.getAttribute("userToken");
         try {
             Date now = new Date();
@@ -246,15 +247,20 @@ public class MobileLogisticsController {
             logistics.setUpdateTime(now);
             logistics.setCreator(token.getUserName());
             logistics.setOperator(token.getUserName());
+            String systemNum = logisticsService.getSystemNum();
+            logistics.setSystemNum(systemNum);
             logisticsService.insertLogistics(logistics);
-            return ResultEnum.getSuccessReturnInfo();
+            data.put("code", ResultEnum.SUCCESS.getCode());
+            data.put("systemNum", systemNum);
+            resultObj.put("result", ResultEnum.SUCCESS.getCode());
+            resultObj.put("data", data);
+            return resultObj.toString();
         } catch (Exception e) {
             logger.error("app设置成已打电话状态错误", e);
             resultObj.put("result", ResultEnum.ERROR.getCode());
             resultObj.put("errormsg", ResultEnum.ERROR.getDesc());
+            return resultObj.toString();
         }
-
-        return resultObj.toString();
     }
 
 }

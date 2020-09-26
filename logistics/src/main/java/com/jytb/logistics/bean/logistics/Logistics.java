@@ -167,6 +167,30 @@ public class Logistics implements Serializable {
     private String senderTel;
 
     /**
+     * 发货地址
+     */
+    @Column(name = "sender_address")
+    private String senderAddress;
+
+    /**
+     * 门店名
+     */
+    @Column(name = "store_name")
+    private String storeName;
+
+    /**
+     * 门店编号
+     */
+    @Column(name = "store_num")
+    private String storeNum;
+
+    /**
+     * 货物名称
+     */
+    @Column(name = "goods_name")
+    private String goodsName;
+
+    /**
      * 所属用户
      */
     @Column(name = "user_id")
@@ -412,6 +436,38 @@ public class Logistics implements Serializable {
 
     public void setSenderTel(String senderTel) {
         this.senderTel = senderTel;
+    }
+
+    public String getSenderAddress() {
+        return senderAddress;
+    }
+
+    public void setSenderAddress(String senderAddress) {
+        this.senderAddress = senderAddress;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public String getStoreNum() {
+        return storeNum;
+    }
+
+    public void setStoreNum(String storeNum) {
+        this.storeNum = storeNum;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
     }
 
     public long getUserId() {

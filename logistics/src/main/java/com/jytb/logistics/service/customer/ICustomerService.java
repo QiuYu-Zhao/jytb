@@ -1,4 +1,4 @@
-package com.jytb.logistics.service.logistics;
+package com.jytb.logistics.service.customer;
 
 import com.jytb.logistics.bean.customer.Customer;
 

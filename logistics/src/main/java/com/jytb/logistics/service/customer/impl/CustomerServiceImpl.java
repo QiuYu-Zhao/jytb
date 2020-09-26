@@ -1,9 +1,9 @@
-package com.jytb.logistics.service.logistics.impl;
+package com.jytb.logistics.service.customer.impl;
 
 import co.chexiao.base.contract.dao.helper.MKDBHelper;
 import com.jytb.logistics.bean.common.User;
 import com.jytb.logistics.bean.customer.Customer;
-import com.jytb.logistics.service.logistics.ICustomerService;
+import com.jytb.logistics.service.customer.ICustomerService;
 import com.jytb.logistics.service.user.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
