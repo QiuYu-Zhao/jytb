@@ -77,6 +77,10 @@ public class CustomerVO implements Serializable {
      */
     private String operator;
 
+    public CustomerVO() {
+
+    }
+
     public CustomerVO(Customer customer) {
         if (customer == null) {
             return;
