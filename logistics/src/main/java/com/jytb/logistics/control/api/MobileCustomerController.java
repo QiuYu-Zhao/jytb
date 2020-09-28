@@ -18,7 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
+<<<<<<< HEAD
  * Created by fulei on 2017/2/16.
+=======
+ * @author zqy
+ * @date 2020/09/26
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
  */
 @Controller
 @RequestMapping("api/customer")
@@ -31,7 +36,11 @@ public class MobileCustomerController {
 
 
     /**
+<<<<<<< HEAD
      * 查询物流单列表
+=======
+     * 查询客户
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
      *
      * @param request
      * @return
@@ -39,13 +48,21 @@ public class MobileCustomerController {
     @RequestMapping(value = "getCustomer", produces = "text/html;charset=UTF-8")
     @ResponseBody
     @TokenCheck
+<<<<<<< HEAD
     public String getCustomer(HttpServletRequest request) {
+=======
+    public String list(HttpServletRequest request) {
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
         JSONObject resultObj = new JSONObject();
         JSONObject data = new JSONObject();
         CustomerVO customerVO = new CustomerVO();
         try {
             String condition = getCondition(request);
+<<<<<<< HEAD
             List<Customer> customerList = customerService.getCustomerListPageByCondition(condition, 1, 1, "id desc");
+=======
+            List<Customer> customerList = customerService.getCustomerListPageByCondition(condition, 1, 1, "id");
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
             if (customerList != null && customerList.size() > 0) {
                 customerVO = new CustomerVO(customerList.get(0));
             }
@@ -54,16 +71,28 @@ public class MobileCustomerController {
             data.put("code", ResultEnum.SUCCESS.getCode());
             resultObj.put("data", data);
         } catch (Exception e) {
+<<<<<<< HEAD
             logger.error("app查询客户错误", e);
             resultObj.put("result", ResultEnum.ERROR.getCode());
             resultObj.put("errormsg", ResultEnum.ERROR.getDesc());
         }
         logger.info("app查询客户返回参数：" + resultObj.toString());
+=======
+            logger.error("app查询客户信息错误", e);
+            resultObj.put("result", ResultEnum.ERROR.getCode());
+            resultObj.put("errormsg", ResultEnum.ERROR.getDesc());
+        }
+        logger.info("app查询客户信息返回参数：" + resultObj.toString());
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
         return resultObj.toString();
     }
 
     private String getCondition(HttpServletRequest request) {
+<<<<<<< HEAD
         StringBuilder condition = new StringBuilder("1=1");
+=======
+        StringBuilder condition = new StringBuilder("");
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
         String systemNum = StringUtil.g(request.getParameter("systemNum"));
         String customerName = StringUtil.g(request.getParameter("customerName"));
         String customerShopName = StringUtil.g(request.getParameter("customerShopName"));
@@ -77,7 +106,11 @@ public class MobileCustomerController {
         }
 
         if (!StringUtil.isEmpty(customerName)) {
+<<<<<<< HEAD
             condition.append(" AND customer_name = '").append(customerName).append("' ");
+=======
+            condition.append(" AND customer_name like = '").append(customerName).append("' ");
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
         }
 
         if (!StringUtil.isEmpty(customerShopName)) {
@@ -96,7 +129,11 @@ public class MobileCustomerController {
             condition.append(" AND phone_num = '").append(phoneNum).append("' ");
         }
 
+<<<<<<< HEAD
         if (!StringUtil.isEmpty(userId)&& !"0".equals(userId)) {
+=======
+        if (!StringUtil.isEmpty(userId)) {
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
             condition.append(" AND user_id = ").append(userId).append(" ");
         }
 

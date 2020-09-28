@@ -78,6 +78,10 @@ public class CustomerVO implements Serializable {
     private String operator;
 
     public CustomerVO() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> cc45cc578d9c54cc28906b328848b1934f487dc7
     }
 
     public CustomerVO(Customer customer) {
