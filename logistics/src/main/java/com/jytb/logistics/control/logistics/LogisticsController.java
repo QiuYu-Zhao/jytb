@@ -374,23 +374,28 @@ public class LogisticsController {
                     List<ExcelData> list = new ArrayList<>();
                     list.add(new ExcelData(StringUtil.g(material.getSystemNum())));
                     list.add(new ExcelData(StringUtil.g(material.getSender())));
+                    list.add(new ExcelData(StringUtil.g(material.getSenderTel())));
+                    list.add(new ExcelData(StringUtil.g(material.getSenderAddress())));
+                    list.add(new ExcelData(StringUtil.g(material.getStoreName())));
+                    list.add(new ExcelData(StringUtil.g(material.getSortNum())));
                     list.add(new ExcelData(StringUtil.g(material.getReceiver())));
                     list.add(new ExcelData(StringUtil.g(material.getReceiverTel())));
                     list.add(new ExcelData(StringUtil.g(material.getReceiverAddress())));
-                    list.add(new ExcelData(StringUtil.g(material.getFreightCharge())));
+                    list.add(new ExcelData(StringUtil.g(material.getRouteName())));
+                    list.add(new ExcelData(StringUtil.g(material.getCount())));
                     list.add(new ExcelData(StringUtil.g(material.getNowPay())));
                     list.add(new ExcelData(StringUtil.g(material.getReachPay())));
-                    list.add(new ExcelData(StringUtil.g(material.getInstead() == 1 ? "是" : "否")));
-                    list.add(new ExcelData(StringUtil.g(material.getInsteadCharge())));
-                    list.add(new ExcelData(StringUtil.g(material.getCount())));
-                    list.add(new ExcelData(StringUtil.g(material.getRouteName())));
+                    list.add(new ExcelData(StringUtil.g(material.getFreightCharge())));
+                    list.add(new ExcelData(StringUtil.g(material.getGoodsName())));
                     list.add(new ExcelData(StringUtil.g(material.getRemark())));
-                    list.add(new ExcelData(StringUtil.g(material.getCreateTime())));
                     if (!CollectionUtil.isEmpty(list)) {
                         data.add(list);
                     }
                 });
-                headList = Arrays.asList("编号", "发件人", "收件人", "联系方式", "收货地址", "运费(元)", "现付", "到付", "是否代收", "代收费(元)", "数量", "线路", "备注", "创建时间");
+                headList = Arrays.asList("编号", "发件人", "发件人电话", "发货地址", "门店名", "门店编号", "收件人", "收件人电话", "收货地址", "线路", "数量", "现付", "到付", "运费（元）", "货物名称", "备注");
+                ExcelUtil.exportExcel(headList, data, response, "logistics");
+            } else {
+                headList = Arrays.asList("编号", "发件人", "发件人电话", "发货地址", "门店名", "门店编号", "收件人", "收件人电话", "收货地址", "线路", "数量", "现付", "到付", "运费（元）", "货物名称", "备注");
                 ExcelUtil.exportExcel(headList, data, response, "logistics");
             }
         } catch (Exception e) {
@@ -401,19 +406,24 @@ public class LogisticsController {
 
     private String getCondition(HttpServletRequest request) {
         StringBuilder condition = new StringBuilder("1=1");
-        String receiver = StringUtil.g(request.getParameter("receiver"));
-        String receiverTel = StringUtil.g(request.getParameter("receiverTel"));
-        String freightCharge = StringUtil.g(request.getParameter("freightCharge"));
-        String receiverAddress = StringUtil.g(request.getParameter("receiverAddress"));
-        String instead = StringUtil.g(request.getParameter("instead"));
-        String insteadCharge = StringUtil.g(request.getParameter("insteadCharge"));
-        String remark = StringUtil.g(request.getParameter("remark"));
         String sender = StringUtil.g(request.getParameter("sender"));
         String senderTel = StringUtil.g(request.getParameter("senderTel"));
+        String senderAddress = StringUtil.g(request.getParameter("senderAddress"));
+        String storeName = StringUtil.g(request.getParameter("storeName"));
+        String storeNum = StringUtil.g(request.getParameter("storeNum"));
+        String receiver = StringUtil.g(request.getParameter("receiver"));
+        String receiverTel = StringUtil.g(request.getParameter("receiverTel"));
+        String receiverAddress = StringUtil.g(request.getParameter("receiverAddress"));
         String userId = StringUtil.g(request.getParameter("userId"));
-        String state = StringUtil.g(request.getParameter("state"));
+        String count = StringUtil.g(request.getParameter("count"));
+        String nowPay = StringUtil.g(request.getParameter("nowPay"));
+        String reachPay = StringUtil.g(request.getParameter("reachPay"));
+        String goodsName = StringUtil.g(request.getParameter("goodsName"));
+        String remark = StringUtil.g(request.getParameter("remark"));
         String createTimeStart = StringUtil.g(request.getParameter("createTimeStart"));
         String createTimeEnd = StringUtil.g(request.getParameter("createTimeEnd"));
+        String state = StringUtil.g(request.getParameter("state"));
+
 
         if (!StringUtil.isEmpty(receiver)) {
             condition.append(" AND receiver like '%").append(receiver).append("%' ");
@@ -423,20 +433,24 @@ public class LogisticsController {
             condition.append(" AND receiver_tel like '%").append(receiverTel).append("%' ");
         }
 
-        if (!StringUtil.isEmpty(freightCharge)) {
-            condition.append(" AND freight_charge = ").append(freightCharge).append(" ");
+        if (!StringUtil.isEmpty(senderAddress)) {
+            condition.append(" AND sender_address like '%").append(senderAddress).append("%' ");
+        }
+
+        if (!StringUtil.isEmpty(goodsName)) {
+            condition.append(" AND goods_name like '%").append(goodsName).append("%' ");
         }
 
         if (!StringUtil.isEmpty(receiverAddress)) {
             condition.append(" AND full_address like '%").append(receiverAddress).append("%' ");
         }
 
-        if (!StringUtil.isEmpty(instead) && !"0".equals(instead)) {
-            condition.append(" AND instead = ").append(instead).append(" ");
+        if (!StringUtil.isEmpty(storeName)) {
+            condition.append(" AND store_name like '%").append(storeName).append("%' ");
         }
 
-        if (!StringUtil.isEmpty(insteadCharge)) {
-            condition.append(" AND instead_charge = ").append(insteadCharge).append(" ");
+        if (!StringUtil.isEmpty(storeNum)) {
+            condition.append(" AND store_num like '%").append(storeNum).append("%' ");
         }
 
         if (!StringUtil.isEmpty(remark)) {
@@ -453,6 +467,18 @@ public class LogisticsController {
 
         if (!StringUtil.isEmpty(userId)) {
             condition.append(" AND user_id = ").append(userId).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(count)) {
+            condition.append(" AND count = ").append(count).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(nowPay)) {
+            condition.append(" AND now_pay = ").append(nowPay).append(" ");
+        }
+
+        if (!StringUtil.isEmpty(reachPay)) {
+            condition.append(" AND reach_pay = ").append(reachPay).append(" ");
         }
 
         if (!StringUtil.isEmpty(state)) {

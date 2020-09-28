@@ -198,7 +198,7 @@ public class CustomerController {
         }
 
         if (!StringUtil.isEmpty(customerShopName)) {
-            condition.append(" AND customer_shop_name = ").append(customerShopName).append(" ");
+            condition.append(" AND customer_shop_name = '").append(customerShopName).append("' ");
         }
 
         if (!StringUtil.isEmpty(address)) {

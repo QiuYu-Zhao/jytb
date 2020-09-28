@@ -140,6 +140,10 @@ public class LogisticsServiceImpl implements ILogisticsService {
             logisticsDB.setInsteadCharge(logistics.getInsteadCharge());
             logisticsDB.setSender(logistics.getSender());
             logisticsDB.setSenderTel(logistics.getSenderTel());
+            logisticsDB.setSenderAddress(logistics.getSenderAddress());
+            logisticsDB.setStoreName(logistics.getStoreName());
+            logisticsDB.setStoreNum(logistics.getStoreNum());
+            logisticsDB.setGoodsName(logistics.getGoodsName());
             logisticsDB.setRemark(logistics.getRemark());
             logisticsDB.setUpdateTime(now);
             logisticsDB.setCount(logistics.getCount());

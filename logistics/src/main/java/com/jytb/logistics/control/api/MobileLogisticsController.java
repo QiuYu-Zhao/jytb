@@ -202,10 +202,78 @@ public class MobileLogisticsController {
         return resultObj.toString();
     }
 
+    /**
+     * 原创建单方法
+     *
+     * @param request
+     * @param logistics
+     * @return
+     */
     @RequestMapping(value = "create", produces = "text/html;charset=UTF-8")
     @ResponseBody
     @TokenCheck
     public String create(HttpServletRequest request, Logistics logistics) {
+        JSONObject resultObj = new JSONObject();
+        Token token = (Token) request.getAttribute("userToken");
+        try {
+            Date now = new Date();
+            logistics.setId(UniqueIDUtil.getUniqueID());
+            logistics.setState(LogisticsStateEnum.NOTSEND.getCode());
+            User user = userService.findById(logistics.getUserId());
+            if (user != null) {
+                logistics.setRouteName(user.getRouteName());
+            }
+            String reg = "[0-9]+";
+            String address = logistics.getReceiverAddress();
+            String[] addressSplit = address.split("-");
+            if (addressSplit.length >= 1 && addressSplit[0].matches(reg)) {
+                logistics.setSortNum(Integer.parseInt(addressSplit[0]));
+            }
+
+            String fullAddress = "";
+            if (!StringUtil.isEmpty(logistics.getReceiverProvinceName())) {
+                fullAddress += logistics.getReceiverProvinceName();
+            }
+            if (!StringUtil.isEmpty(logistics.getReceiverCityName())) {
+                fullAddress += logistics.getReceiverCityName();
+            }
+            if (!StringUtil.isEmpty(logistics.getReceiverAreaName())) {
+                fullAddress += logistics.getReceiverAreaName();
+            }
+            if (!StringUtil.isEmpty(logistics.getReceiverStreetName())) {
+                fullAddress += logistics.getReceiverStreetName();
+            }
+            if (!StringUtil.isEmpty(logistics.getReceiverAddress())) {
+                fullAddress += logistics.getReceiverAddress();
+            }
+
+            logistics.setFullAddress(fullAddress);
+            logistics.setCreateTime(now);
+            logistics.setUpdateTime(now);
+            logistics.setCreator(token.getUserName());
+            logistics.setOperator(token.getUserName());
+            logisticsService.insertLogistics(logistics);
+            return ResultEnum.getSuccessReturnInfo();
+        } catch (Exception e) {
+            logger.error("app设置成已打电话状态错误", e);
+            resultObj.put("result", ResultEnum.ERROR.getCode());
+            resultObj.put("errormsg", ResultEnum.ERROR.getDesc());
+        }
+
+        return resultObj.toString();
+    }
+
+
+    /***
+     * 升级后创建单方法
+     * @param request
+     * @param logistics
+     * @return
+     */
+    @RequestMapping(value = "create0", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    @TokenCheck
+    public String create0(HttpServletRequest request, Logistics logistics) {
         JSONObject resultObj = new JSONObject();
         JSONObject data = new JSONObject();
 
@@ -256,7 +324,7 @@ public class MobileLogisticsController {
             resultObj.put("data", data);
             return resultObj.toString();
         } catch (Exception e) {
-            logger.error("app设置成已打电话状态错误", e);
+            logger.error("app创建单错误", e);
             resultObj.put("result", ResultEnum.ERROR.getCode());
             resultObj.put("errormsg", ResultEnum.ERROR.getDesc());
             return resultObj.toString();
